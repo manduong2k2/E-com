@@ -47,14 +47,22 @@ class userController extends Controller
         try {
             $credentials = request(['email', 'password']);
             $user = User::where('email', $credentials['email'])->first();
-            $hashedPassword = $user->password;
-            if (Hash::check($credentials['password'], $hashedPassword)) {
-                $token = JWTAuth::fromUser($user);
-                return response()->json([
-                    'success' => true,
-                    'token' => $token,
-                ]);
-            } else {
+            if($user){
+                $hashedPassword = $user->password;
+                if (Hash::check($credentials['password'], $hashedPassword)) {
+                    $token = JWTAuth::fromUser($user);
+                    return response()->json([
+                        'success' => true,
+                        'token' => $token,
+                    ]);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid credentials',
+                    ]);
+                } 
+            }
+            else{
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid credentials',

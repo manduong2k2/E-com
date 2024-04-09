@@ -52,14 +52,21 @@ class productController extends Controller
         }
     }
 
-    public function store(Request $request)
-    {
-        
-    }
-
     public function show(string $id)
     {
-        
+        $product = Product::with(['user','brand','category'])->find($id);
+
+        if ($product) {
+            return response()->json([
+                'success' => true,
+                'product' => $product,
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'product not found',
+            ]);
+        }
     }
 
     public function edit(string $id)
