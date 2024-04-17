@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9db098be87352a11f8302eacc9804921",
+    "content-hash": "1905b01ddd60afa618d1d0cb7e5893a0",
     "packages": [
         {
             "name": "brick/math",
@@ -1044,6 +1044,53 @@
                 }
             ],
             "time": "2023-12-03T19:50:20+00:00"
+        },
+        {
+            "name": "jeidison/composite-key",
+            "version": "0.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeidison/composite-key.git",
+                "reference": "c98658dd4158e46a1274e27034377d5db0d358bc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeidison/composite-key/zipball/c98658dd4158e46a1274e27034377d5db0d358bc",
+                "reference": "c98658dd4158e46a1274e27034377d5db0d358bc",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0|^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jeidison\\CompositeKey\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jeidison Farias",
+                    "email": "jeidison.farias@gmail.com"
+                }
+            ],
+            "description": "Laravel composite key",
+            "keywords": [
+                "Composite Key",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/jeidison/composite-key/issues",
+                "source": "https://github.com/jeidison/composite-key/tree/0.4.0"
+            },
+            "time": "2021-09-15T15:45:00+00:00"
         },
         {
             "name": "laravel/framework",
