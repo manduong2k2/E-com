@@ -58,7 +58,6 @@ class orderController extends Controller
                             $Item->cost = $product->price * $cart->quantity; 
                             $Item->quantity = $cart->quantity;
                             $Item->save();
-                            
                             $cart->delete();
                         }
                     }

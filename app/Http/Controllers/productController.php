@@ -13,14 +13,14 @@ class productController extends Controller
 
     public function index()
     {
-        $products = Product::with(['user', 'brand','category'])->get();
-        return response()->json($products);
-    }
-
-    public function byBrand(string $id)
-    {
-        $products = Product::with(['user', 'brand', 'category'])->where('brand_id', $id)->get();
-        return response()->json($products);
+        try{
+            $products = Product::with(['user', 'brand','category'])->get();
+            return response()->json($products);
+        }catch (Exception $e) {
+            return response()->json([
+                'message' => $e->__toString(),
+            ], 501);
+        }
     }
 
     public function personal()
@@ -125,7 +125,21 @@ class productController extends Controller
     {
     }
 
-    public function destroy(string $id)
+    public function destroy(string $product_id)
     {
+        try{
+            $product = Product::find($product_id);
+            if($product) {
+                $product->delete();
+                response()->json(['success' => 'Product deleted successfully !', 200]);
+            }
+            else{
+                response()->json(['success' => 'success', 404]);
+            }
+        }catch(Exception $e){
+            return response()->json([
+                'message' => $e->__toString(),
+            ], 501);
+        }
     }
 }

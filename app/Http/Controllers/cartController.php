@@ -57,32 +57,14 @@ class cartController extends Controller
         }
     }
 
-    public function increase(string $product_id)
+    public function update(Request $req,string $product_id)
     {
         try{
             $token = JWTAuth::getToken();
             $payload = JWTAuth::getPayload($token)->toArray();
             $cart = Cart::where('user_id', $payload['user_id'])->where('product_id', $product_id)->first();
             if($cart){
-                $cart->quantity+=1;
-                $cart->save();
-            }
-            response()->json(['success' => 'success', 200]);
-        }catch(Exception $e){
-            return response()->json([
-                'message' => $e->__toString(),
-            ], 501);
-        }
-    }
-    
-    public function decrease(string $product_id)
-    {
-        try{
-            $token = JWTAuth::getToken();
-            $payload = JWTAuth::getPayload($token)->toArray();
-            $cart = Cart::where('user_id', $payload['user_id'])->where('product_id', $product_id)->first();
-            if($cart){
-                $cart->quantity-=1;
+                $cart->quantity=$req->number;
                 $cart->save();
             }
             response()->json(['success' => 'success', 200]);
@@ -118,14 +100,6 @@ class cartController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $product_id)
@@ -134,7 +108,7 @@ class cartController extends Controller
             $token = JWTAuth::getToken();
             $payload = JWTAuth::getPayload($token)->toArray();
             $cart = Cart::where('user_id', $payload['user_id'])->where('product_id', $product_id)->first();
-            if($cart) $cart::delete();
+            if($cart) $cart->delete();
             response()->json(['success' => 'success', 200]);
         }catch(Exception $e){
             return response()->json([

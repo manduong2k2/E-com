@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\RecoverMail;
+use App\Mail\UserNotification;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class userController extends Controller
 {
+    
+
     public function index()
     {
         try {
@@ -148,6 +154,57 @@ class userController extends Controller
             ], 500);
         }
     }
+
+    public function changePassword(Request $req)
+    {
+        try {
+            $token = JWTAuth::getToken();
+            $payload = JWTAuth::getPayload($token)->toArray();
+            $credentials = request(['oldPassword', 'newPassword']);
+            $user = User::find($payload['user_id']);
+            
+            if (!Hash::check($credentials['oldPassword'], $user->password)) {
+                return response()->json(['message' => 'Mật khẩu cũ không đúng !'], 404);
+            }
+
+            $user->password = Hash::make($credentials['newPassword']);
+            $user->save();
+            return response()->json(['message' => 'Category updated successfully', 'data' => $user], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->__toString(),
+            ], 500);
+        }
+    }
+
+    public function sendEmail(string $email)
+    {
+        try {
+            $user = User::where('email',$email)->first();
+            $code = Str::random(6);
+            if ($user) {
+                Mail::to($user->email)->send(new RecoverMail($user,$code));
+
+                $user->password = Hash::make($code);
+                $user->save();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Send email to user success !',
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'user not found',
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->__toString(),
+            ], 502);
+        }
+    }
+
     public function show()
     {
         try {

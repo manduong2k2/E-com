@@ -10,8 +10,15 @@ class brandController extends Controller
 {
     public function index()
     {
-        $brands = Brand::with([])->get();
-        return response()->json($brands);
+        try{
+            $brands = Brand::with([])->get();
+            return response()->json($brands);
+        }
+        catch (Exception $e) {
+            return response()->json([
+                'message' => $e->__toString(),
+            ], 500);
+        }
     }
     public function create(Request $req)
     {

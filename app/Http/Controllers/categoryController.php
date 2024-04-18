@@ -10,8 +10,14 @@ class categoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::with([])->get();
-        return response()->json($categories);
+        try{
+            $categories = Category::with([])->get();
+            return response()->json($categories);
+        }catch(Exception $e){
+            return response()->json([
+                'message' => $e->__toString(),
+            ], 500);
+        }
     }
     public function create(Request $req)
     {
