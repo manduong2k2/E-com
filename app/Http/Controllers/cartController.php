@@ -57,14 +57,31 @@ class cartController extends Controller
         }
     }
 
-    public function update(Request $req,string $product_id)
+    public function increase(string $product_id)
     {
         try{
             $token = JWTAuth::getToken();
             $payload = JWTAuth::getPayload($token)->toArray();
             $cart = Cart::where('user_id', $payload['user_id'])->where('product_id', $product_id)->first();
             if($cart){
-                $cart->quantity=$req->number;
+                $cart->quantity++;
+                $cart->save();
+            }
+            response()->json(['success' => 'success', 200]);
+        }catch(Exception $e){
+            return response()->json([
+                'message' => $e->__toString(),
+            ], 501);
+        }
+    }
+    public function decrease(string $product_id)
+    {
+        try{
+            $token = JWTAuth::getToken();
+            $payload = JWTAuth::getPayload($token)->toArray();
+            $cart = Cart::where('user_id', $payload['user_id'])->where('product_id', $product_id)->first();
+            if($cart){
+                $cart->quantity--;
                 $cart->save();
             }
             response()->json(['success' => 'success', 200]);

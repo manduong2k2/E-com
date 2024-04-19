@@ -63,13 +63,17 @@ Route::get('/users',[userController::class,'index'])->middleware(Authorize::clas
 
 Route::get('/user',[userController::class,'show']);
 
+Route::get('/user/products',[userController::class,'products']);
+
+Route::delete('/user/product/{id}',[userController::class,'destroy']);
+
 Route::post('/user/forgot/{email}',[userController::class,'sendEmail']);
 
 Route::post('/user/edit',[userController::class,'edit'])->middleware(Authenticate::class);
 
 Route::post('/signup',[userController::class,'signup']);
 
-Route::post('/changePassword',[userController::class,'changePassword'])->middleware(Authenticate::class);
+Route::post('/user/changePassword',[userController::class,'changePassword'])->middleware(Authenticate::class);
 
 Route::post('/login',[userController::class,'login'] );
 
@@ -83,7 +87,9 @@ Route::get('/carts',[cartController::class,'index'])->middleware(Authenticate::c
 
 Route::post('/cart/add/{product_id}',[cartController::class,'create'])->middleware(Authenticate::class);
 
-Route::post('/cart/update/{product_id}',[cartController::class,'update'])->middleware(Authenticate::class);
+Route::post('/cart/increase/{product_id}',[cartController::class,'increase'])->middleware(Authenticate::class);
+
+Route::post('/cart/decrease/{product_id}',[cartController::class,'decrease'])->middleware(Authenticate::class);
 
 Route::delete('/cart/delete/{product_id}',[cartController::class,'destroy'])->middleware(Authenticate::class);
 

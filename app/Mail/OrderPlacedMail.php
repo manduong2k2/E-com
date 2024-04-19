@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -15,13 +16,14 @@ class OrderPlacedMail extends Mailable
     use Queueable, SerializesModels;
 
     public $user;
-
+    public $order;
     /**
      * Create a new message instance.
      */
-    public function __construct(User $user)
+    public function __construct(User $user,Order $order)
     {
         $this->user = $user;
+        $this->order = $order;
     }
 
     public function build()
@@ -35,7 +37,7 @@ class OrderPlacedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'User Notification',
+            subject: 'Đặt hàng thành công',
         );
     }
 

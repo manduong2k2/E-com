@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderPlacedMail;
 use App\Models\Cart;
 use App\Models\Item;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth as JWTAuth;
 use Exception;
+use Illuminate\Support\Facades\Mail;
 
 class orderController extends Controller
 {
@@ -22,7 +25,7 @@ class orderController extends Controller
             $token = JWTAuth::getToken();
             $payload = JWTAuth::getPayload($token)->toArray();
 
-            $orders = Order::with(['product'])->where('user_id', $payload['user_id']);
+            $orders = Order::with(['items.product'])->where('user_id', $payload['user_id'])->get();
             return response()->json($orders);
         } catch (Exception $e) {
             return response()->json([
@@ -44,29 +47,35 @@ class orderController extends Controller
             $order->user_id = $payload['user_id'];
             $order->date = Carbon::now();
             $order->save();
-            $product_ids = $req->input('product_ids', []);
+            $user = User::find($payload['user_id']);
+            $carts = Cart::with(['product'])->where('user_id', $payload['user_id'])->get();
 
-            if($product_ids->isNotEmpty()){
-                foreach ($product_ids as $product_id) {
-                    $cart = Cart::with(['product'])->where('user_id', $payload['user_id'])->where('product_id', $product_id)->first();
-                    if ($cart) {
-                        $product = $cart->product;
-                        if ($product) {
-                            $Item = new Item();
-                            $Item->order_id = $order->id;
-                            $Item->product_id = $product_id;
-                            $Item->cost = $product->price * $cart->quantity; 
-                            $Item->quantity = $cart->quantity;
-                            $Item->save();
-                            $cart->delete();
-                        }
+            if ($carts->isNotEmpty()) {
+                foreach ($carts as $cart) {
+                    $product = $cart->product;
+                    if ($product) {
+                        $item = new Item();
+                        $item->order_id = $order->id;
+                        $item->product_id = $cart->product_id;
+                        $item->cost = $product->price * $cart->quantity;
+                        $item->quantity = $cart->quantity;
+                        $product->stock -= $cart->quantity;
+                        $product->save();
+                        $order->total+=$item->cost;
+                        $item->save();
+                        $cart->delete();
                     }
                 }
+                $order->save();
+                Mail::to($user->email)->send(new OrderPlacedMail($user,$order));
+                return response()->json([
+                    'message' => 'Order placed successfully !',
+                ], 200);
             }
             else{
                 return response()->json([
                     'message' => 'Cart is empty',
-                ], 401);
+                ], 402);
             }
             
         } catch (Exception $e) {

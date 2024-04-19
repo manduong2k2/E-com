@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\RecoverMail;
 use App\Mail\UserNotification;
+use App\Models\Product;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -35,6 +36,7 @@ class userController extends Controller
                 'fullname' => 'required|string|max:255',
                 'image' => 'required|file',
                 'email' => 'required|string|max:255',
+                'address' => 'string|max:255',
                 'password' => 'required|string|max:255',
             ]);
 
@@ -70,6 +72,8 @@ class userController extends Controller
         try {
             $credentials = request(['email', 'password']);
             $user = User::where('email', $credentials['email'])->first();
+            if(!$user)
+            $user = User::where('username', $credentials['email'])->first();
             if ($user) {
                 $hashedPassword = $user->password;
                 if (Hash::check($credentials['password'], $hashedPassword)) {
@@ -102,7 +106,7 @@ class userController extends Controller
             $token = JWTAuth::getToken();
             $payload = JWTAuth::getPayload($token)->toArray();
 
-            $user = User::with(['roles'])->find($payload['id']);
+            $user = User::with(['roles'])->find($payload['user_id']);
 
             if (!$user) {
                 return response()->json(['message' => 'Người dùng không tồn tại'], 404);
@@ -112,12 +116,20 @@ class userController extends Controller
                 'username',
                 'fullname',
                 'email',
-                'image'
+                'address',
             ]));
+
+            if ($req->hasFile('image')) {
+                $image = $req->file('image');
+                $imageName = $user->username . '.jpg';
+
+                $image->storeAs('images/user', $imageName);
+                $user->image = 'http://jul2nd.ddns.net/storage/images/user/' . $user->username . '.jpg';
+            }
 
             $user->save();
 
-            return response()->json(['message' => 'Category updated successfully', 'data' => $user], 200);
+            return response()->json(['message' => 'User updated successfully', 'data' => $user], 200);
         } catch (Exception $e) {
             return response()->json([
                 'message' => $e->__toString(),
@@ -228,6 +240,48 @@ class userController extends Controller
             return response()->json([
                 'message' => $e->__toString(),
             ], 502);
+        }
+    }
+    public function products()
+    {
+        try {
+            $token = JWTAuth::getToken();
+            $payload = JWTAuth::getPayload($token)->toArray();
+
+            $products= Product::with('brand','category')->where('user_id',$payload['user_id'])->get();
+
+            if ($products->isNotEmpty()) {
+                return response()->json($products);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'user not found',
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->__toString(),
+            ], 502);
+        }
+    }
+    public function destroy(string $product_id)
+    {
+        try{
+            $token = JWTAuth::getToken();
+            $payload = JWTAuth::getPayload($token)->toArray();
+            
+            $product = Product::find($product_id);
+            if($product) {
+                $product->delete();
+                response()->json(['success' => 'Product deleted successfully !', 200]);
+            }
+            else{
+                response()->json(['success' => 'success', 404]);
+            }
+        }catch(Exception $e){
+            return response()->json([
+                'message' => $e->__toString(),
+            ], 501);
         }
     }
 }
