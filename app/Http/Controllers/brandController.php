@@ -34,9 +34,9 @@ class brandController extends Controller
             if ($req->hasFile('image')) {
                 $image = $req->file('image');
                 $imageName = $brand->id . '.jpg';
-                $image->storeAs('images/brand', $imageName);
+                $image->storeAs('public/images/brand', $imageName);
             }
-            $brand->image = 'http://jul2nd.ddns.net/storage/images/brand/' . $brand->id . '.jpg';
+            $brand->image = 'http://localhost/storage/images/brand/' . $brand->id . '.jpg';
             $brand->save();
 
             return response()->json([
@@ -90,9 +90,9 @@ class brandController extends Controller
             if ($req->hasFile('image')) {
                 $image = $req->file('image');
                 $imageName = $brand->id . '.jpg';
-                $image->storeAs('images/brand', $imageName);
+                $image->storeAs('public/images/brand', $imageName);
             }
-            $brand->image = 'http://jul2nd.ddns.net/storage/images/brand/' . $brand->id . '.jpg';
+            $brand->image = 'http://localhost/storage/images/brand/' . $brand->id . '.jpg';
 
             $brand->save();
 

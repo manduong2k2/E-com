@@ -52,7 +52,7 @@ class productController extends Controller
                 'image' => 'required|image|mimes:jpeg,png,jpg,gif',
                 'stock' => 'required|numeric',
                 'price' => 'required|numeric',
-                'description' => 'required|string|max:255',
+                'description' => 'required|string',
                 'category_id' => 'required|numeric',
                 'brand_id' => 'required|numeric',
             ]);
@@ -66,9 +66,9 @@ class productController extends Controller
                 $image = $req->file('image');
                 $imageName = $product->id . '.jpg';
 
-                $image->storeAs('images/product', $imageName);
+                $image->storeAs('public/images/product', $imageName);
             }
-            $product->image = 'http://jul2nd.ddns.net/storage/images/product/' . $product->id . '.jpg';
+            $product->image = 'http://localhost/storage/images/product/' . $product->id . '.jpg';
             $product->save();
 
             return response()->json([

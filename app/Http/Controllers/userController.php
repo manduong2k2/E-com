@@ -46,15 +46,10 @@ class userController extends Controller
                 $image = $req->file('image');
                 $imageName = $user->username . '.jpg';
 
-                $image->storeAs('images/user', $imageName);
+                $image->storeAs('public/images/user', $imageName);
             }
-            $user->image = 'http://jul2nd.ddns.net/storage/images/user/' . $user->username . '.jpg';
+            $user->image = 'http://localhost/storage/images/user/' . $user->username . '.jpg';
             $user->save();
-
-            $user->roles()->attach(1);
-
-            if ($user->email == 'manduong2k2@gmail.com')
-                $user->roles()->attach(2);
 
             return response()->json([
                 'message' => 'User created successfully',
@@ -123,8 +118,8 @@ class userController extends Controller
                 $image = $req->file('image');
                 $imageName = $user->username . '.jpg';
 
-                $image->storeAs('images/user', $imageName);
-                $user->image = 'http://jul2nd.ddns.net/storage/images/user/' . $user->username . '.jpg';
+                $image->storeAs('public/images/user', $imageName);
+                $user->image = 'http://localhost/storage/images/user/' . $user->username . '.jpg';
             }
 
             $user->save();
