@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NotificationSent;
+use App\Jobs\SendEmail;
 use App\Mail\RecoverMail;
 use App\Mail\UserNotification;
 use App\Models\Product;
@@ -10,6 +12,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -50,7 +53,6 @@ class userController extends Controller
             }
             $user->image = 'http://localhost/storage/images/user/' . $user->username . '.jpg';
             $user->save();
-
             return response()->json([
                 'message' => 'User created successfully',
                 'data' => $user,
@@ -190,7 +192,7 @@ class userController extends Controller
             $user = User::where('email',$email)->first();
             $code = Str::random(6);
             if ($user) {
-                Mail::to($user->email)->send(new RecoverMail($user,$code));
+                Queue::push(new SendEmail(new RecoverMail($user,$code)));
 
                 $user->password = Hash::make($code);
                 $user->save();

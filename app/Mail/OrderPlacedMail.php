@@ -11,19 +11,21 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class OrderPlacedMail extends Mailable
+class OrderPlacedMail extends Mailable implements iMail
 {
     use Queueable, SerializesModels;
 
-    public $user;
     public $order;
     /**
      * Create a new message instance.
      */
-    public function __construct(User $user,Order $order)
+    public function __construct(Order $order)
     {
-        $this->user = $user;
         $this->order = $order;
+    }
+
+    public function getUser(){
+        return $this->order->user;
     }
 
     public function build()

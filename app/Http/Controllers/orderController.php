@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendEmail;
 use App\Mail\OrderPlacedMail;
 use App\Models\Cart;
 use App\Models\Item;
@@ -13,6 +14,7 @@ use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth as JWTAuth;
 use Exception;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Queue;
 
 class orderController extends Controller
 {
@@ -67,7 +69,10 @@ class orderController extends Controller
                     }
                 }
                 $order->save();
-                Mail::to($user->email)->send(new OrderPlacedMail($user,$order));
+                $orderMail=new OrderPlacedMail($order);
+                $sendEmail=new SendEmail($orderMail);
+                //Queue::push($sendEmail); //work
+                SendEmail::dispatch($orderMail)->onQueue('emails'); //work
                 return response()->json([
                     'message' => 'Order placed successfully !',
                 ], 200);

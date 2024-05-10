@@ -20,7 +20,7 @@
     </style>
 </head>
 <body>
-    <h2>Xin chào, {{ $user->fullname }}</h2>
+    <h2>Xin chào, {{ $order->user->fullname }}</h2>
     <p>Đơn hàng của bạn đã được đặt </p>
     
     <table>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NotificationSent;
 use App\Models\Cart;
 use Tymon\JWTAuth\Facades\JWTAuth as JWTAuth;
 use Exception;
@@ -49,6 +50,7 @@ class cartController extends Controller
                 $cart->quantity+=1;
                 $cart->save();
             }
+            event(new NotificationSent('Added to cart'));
             response()->json(['success' => 'success', 200]);
         } catch (Exception $e) {
             return response()->json([

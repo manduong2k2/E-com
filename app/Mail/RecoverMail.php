@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class RecoverMail extends Mailable
+class RecoverMail extends Mailable implements iMail
 {
     use Queueable, SerializesModels;
 
@@ -23,7 +23,11 @@ class RecoverMail extends Mailable
     public function __construct(User $user,string $code)
     {
         $this->user = $user;
-        $this->code =  $code;
+        $this->code = $code;
+    }
+
+    public function getUser(){
+        return $this->user;
     }
 
     public function build()
